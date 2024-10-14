@@ -34,8 +34,13 @@ io.on('connection', (socket) => {
   // Listen for song selection from admin
   socket.on('songSelected', (song) => {
     console.log('Song selected by admin:', song);
-    // Emit the song to all connected clients (players)
     io.emit('songSelected', song);
+  });
+
+  // Listen for quit performance event from admin
+  socket.on('quitPerformance', () => {
+    console.log('Performance ended by admin');
+    io.emit('performanceEnded'); // Notify all players that the performance has ended
   });
 
   socket.on('disconnect', () => {
