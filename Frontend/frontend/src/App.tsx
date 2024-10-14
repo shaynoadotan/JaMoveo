@@ -22,7 +22,7 @@ function App() {
         <Route path="/player" element={<PlayerPage />} /> {/* No conditional Navigate here */}
         <Route path="/admin" element={<AdminPage />} />    {/* No conditional Navigate here */}
         <Route path="/results" element={<ResultsPage />} />
-        <Route path="/live" element={<LivePage />} />
+        <Route path="/live" element={<LivePage isAdmin={false} isSinger={false} />} />
         <Route path="/" element={<SignupPage setIsAdmin={setIsAdmin} />} /> {/* Set initial page */}
       </Routes>
     </Router>
