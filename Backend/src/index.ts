@@ -2,7 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 const app = express();
@@ -11,6 +13,11 @@ const io = new Server(server, { cors: { origin: '*' } });
 
 app.use(cors());
 app.use(express.json());
+
+// Connect to MongoDB Atlas
+mongoose.connect(process.env.MONGO_URI!)
+  .then(() => console.log('MongoDB connected'))
+  .catch((error) => console.log('MongoDB connection error:', error));
 
 io.on('connection', (socket) => {
   console.log('a user connected');
