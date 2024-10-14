@@ -1,25 +1,39 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import SignupPage from './components/SignupPage';
+import LoginPage from './components/LoginPage';
+import AdminPage from './components/AdminPage';
+// import { PlayerPage } from './components/PlayerPage';
+import LivePage from './components/LivePage';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <nav>
+          <ul>
+            <li><Link to="/signup">Signup</Link></li>
+            <li><Link to="/login">Login</Link></li>
+            <li><Link to="/admin">Admin</Link></li>
+            <li><Link to="/player">Player</Link></li>
+            <li><Link to="/live">Live</Link></li>
+          </ul>
+        </nav>
+        <Routes>
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          {/* <Route path="/player" element={<PlayerPage />} /> */}
+          <Route path="/live" element={<LivePage />} />
+          <Route path="/" element={
+            <>
+              <h1>Welcome to JaMoveo</h1>
+              <p>Select a page from the navigation.</p>
+            </>
+          } />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
