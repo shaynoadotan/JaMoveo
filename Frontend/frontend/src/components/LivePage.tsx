@@ -26,23 +26,30 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
   const [song, setSong] = useState<Song | null>(initialSong); // State to hold the current song
   const [isScrolling, setIsScrolling] = useState(false);
   const [scrollInterval, setScrollInterval] = useState<NodeJS.Timeout | null>(null);
+  const socket = io('http://localhost:5000'); // Connect to the server
 
   // Function to start/stop automatic scrolling
   const toggleScrolling = () => {
-    setIsScrolling((prev) => !prev);
+    const newScrollingState = !isScrolling;
+    setIsScrolling(newScrollingState);
+    // Emit scroll start/stop event to all clients
+    socket.emit('toggleScrolling', newScrollingState);
   };
 
   useEffect(() => {
-    const socket = io('http://localhost:5000'); // Connect to the server
-
-    // Listen for song selection updates from the admin
-    socket.on('songSelected', (newSong: Song) => {
+    const socketInstance = io('http://localhost:5000'); // Connect to the server
+    socketInstance.on('songSelected', (newSong: Song) => {
       console.log('New song selected:', newSong); // For debugging purposes
       setSong(newSong); // Update state with the new song selected by admin
     });
 
+    // Listen for scrolling toggle from the server
+    socketInstance.on('toggleScrolling', (shouldScroll: boolean) => {
+      setIsScrolling(shouldScroll);
+    });
+
     return () => {
-      socket.disconnect(); // Clean up socket connection on unmount
+      socketInstance.disconnect(); // Clean up socket connection on unmount
     };
   }, []);
 
@@ -63,7 +70,6 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
 
   // Function to quit live performance (admin only)
   const handleQuit = () => {
-    const socket = io('http://localhost:5000'); // Connect to the server
     socket.emit('quitPerformance'); // Emit the quit event to all players
     navigate('/admin'); // Redirect admin and players to the main page
   };
@@ -88,6 +94,7 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
     </Box>
   );
 
+  // Check if song is not available yet
   if (!song) {
     return <Typography variant="h4">Waiting for the next song...</Typography>;
   }
