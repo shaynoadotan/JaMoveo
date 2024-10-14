@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const AdminPage: React.FC = () => {
   const [query, setQuery] = useState('');
-  const [searchPerformed, setSearchPerformed] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSearchPerformed(true);
+    navigate('/results', { state: { query } }); // Pass the search query to results page
   };
 
   return (
@@ -21,8 +22,6 @@ const AdminPage: React.FC = () => {
         />
         <button type="submit">Search</button>
       </form>
-
-      {searchPerformed && <p>Moving to Results Page...</p>}
     </div>
   );
 };

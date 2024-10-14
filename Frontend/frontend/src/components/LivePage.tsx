@@ -1,22 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { io } from 'socket.io-client';
-
-interface Song {
-    id: string;
-    title: string;
-    artist: string;
-    lyrics?: string; // Optional properties
-    chords?: string;
-  }
-  
+import { useLocation } from 'react-router-dom';
 
 const LivePage: React.FC = () => {
-    const [song, setSong] = useState<Song | null>(null); // The song can be null initially
+  const location = useLocation();
+  const { song } = location.state;
 
   useEffect(() => {
-    const socket = io('http://localhost:5000');
-    socket.on('songSelected', (songData) => {
-      setSong(songData);
+    const socket = io('http://localhost:5000'); // Replace with your backend URL
+    socket.on('songSelected', (newSong) => {
+      alert(`Now playing: ${newSong.name} by ${newSong.artist}`);
+      // Update state to reflect new song
     });
 
     return () => {
@@ -26,18 +20,10 @@ const LivePage: React.FC = () => {
 
   return (
     <div>
-      {song ? (
-        <div>
-          <h2>{song.title}</h2>
-          <h3>By {song.artist}</h3>
-          {/* Display chords and lyrics */}
-        </div>
-      ) : (
-        <h2>Waiting for next song...</h2>
-      )}
+      <h2>{song.name} by {song.artist}</h2>
+      {/* Display lyrics and chords */}
     </div>
   );
-  
 };
 
 export default LivePage;

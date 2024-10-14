@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface Song {
   name: string;
@@ -7,14 +8,20 @@ interface Song {
 }
 
 const ResultsPage: React.FC = () => {
-  const [songs] = useState<Song[]>([
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { query } = location.state; // Get the search query passed from AdminPage
+
+  // Example static songs for demonstration
+  const songs: Song[] = [
     { name: 'Hey Jude', artist: 'The Beatles', image: 'https://example.com/heyjude.jpg' },
     { name: 'Imagine', artist: 'John Lennon', image: 'https://example.com/imagine.jpg' },
-  ]); // Example static data
+  ].filter(song => song.name.toLowerCase().includes(query.toLowerCase())); // Filter based on query
 
   const selectSong = (song: Song) => {
     // Emit event to socket server for live page transition
-    alert(`${song.name} by ${song.artist} selected!`);
+    alert(`Selected song: ${song.name} by ${song.artist}`);
+    navigate('/live', { state: { song } }); // Navigate to live page with selected song
   };
 
   return (

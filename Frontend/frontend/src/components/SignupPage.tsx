@@ -1,56 +1,16 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const SignupPage: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [instrument, setInstrument] = useState('');
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // Send signup data to the backend
-      const response = await axios.post('http://localhost:5000/api/signup', {
-        username,
-        password,
-        instrument
-      });
-      alert('Signup successful!');
-    } catch (error) {
-      console.error('Signup error:', error);
-      alert('Error signing up.');
-    }
-  };
+const SignupPage: React.FC<{ setIsAdmin: (isAdmin: boolean) => void }> = ({ setIsAdmin }) => {
+  const navigate = useNavigate();
 
   return (
-    <form onSubmit={handleSignup}>
-      <h2>Signup</h2>
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        required
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <select
-        value={instrument}
-        onChange={(e) => setInstrument(e.target.value)}
-        required
-      >
-        <option value="">Select Instrument</option>
-        <option value="Guitar">Guitar</option>
-        <option value="Vocals">Vocals</option>
-        <option value="Drums">Drums</option>
-      </select>
-      <button type="submit">Signup</button>
-    </form>
+    <div>
+      <h1>Signup</h1>
+      <button onClick={() => navigate('/adminsignup')}>Admin Signup</button>
+      <button onClick={() => navigate('/playersignup')}>Player Signup</button>
+      <button onClick={() => navigate('/login')}>Login</button>
+    </div>
   );
 };
 
