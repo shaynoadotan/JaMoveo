@@ -9,9 +9,9 @@ import authRoutes from './routes/auth'; // Adjust the path as necessary
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
-// const io = new Server(server, { cors: { origin: '*' } });
+const server = http.createServer(app); // Correctly create a shared server instance
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -20,23 +20,6 @@ mongoose.connect(process.env.MONGO_URI!)
   .then(() => console.log('MongoDB connected'))
   .catch((error) => console.log('MongoDB connection error:', error));
 
-// io.on('connection', (socket) => {
-//   console.log('a user connected');
-//   socket.on('disconnect', () => {
-//     console.log('user disconnected');
-//   });
-// });
-
-// io.on('connection', (socket) => {
-//     socket.on('joinSession', (sessionId) => {
-//       socket.join(sessionId);
-//     });
-  
-//     socket.on('selectSong', (songData) => {
-//       io.to(songData.sessionId).emit('songSelected', songData);
-//     });
-//   });
-  
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000", // Your React app URL
@@ -44,11 +27,15 @@ const io = new Server(server, {
   }
 });
 
+// Handle socket connections
 io.on('connection', (socket) => {
   console.log('A user connected');
 
+  // Listen for song selection from admin
   socket.on('songSelected', (song) => {
-    socket.broadcast.emit('songSelected', song); // Broadcast the selected song to all clients
+    console.log('Song selected by admin:', song);
+    // Emit the song to all connected clients (players)
+    io.emit('songSelected', song);
   });
 
   socket.on('disconnect', () => {
@@ -56,11 +43,16 @@ io.on('connection', (socket) => {
   });
 });
 
-
 // Use Auth Routes
 app.use('/api', authRoutes);
 
+// Handle Undefined Routes
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
+// Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {  // Listen on the server object, not app
   console.log(`Server running on port ${PORT}`);
 });

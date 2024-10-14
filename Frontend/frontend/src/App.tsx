@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
 import PlayerSignupPage from './components/PlayerSignUpPage';
@@ -19,11 +19,11 @@ function App() {
         <Route path="/playersignup" element={<PlayerSignupPage />} />
         <Route path="/adminsignup" element={<AdminSignupPage />} />
         <Route path="/login" element={<LoginPage setIsAdmin={setIsAdmin} />} />
-        <Route path="/player" element={isAdmin === false ? <PlayerPage /> : <Navigate to="/admin" />} />
-        <Route path="/admin" element={isAdmin ? <AdminPage /> : <Navigate to="/player" />} />
-        <Route path="/results" element={isAdmin ? <ResultsPage /> : <Navigate to="/player" />} />
+        <Route path="/player" element={<PlayerPage />} /> {/* No conditional Navigate here */}
+        <Route path="/admin" element={<AdminPage />} />    {/* No conditional Navigate here */}
+        <Route path="/results" element={<ResultsPage />} />
         <Route path="/live" element={<LivePage />} />
-        <Route path="/" element={<Navigate to="/signup" />} />
+        <Route path="/" element={<SignupPage setIsAdmin={setIsAdmin} />} /> {/* Set initial page */}
       </Routes>
     </Router>
   );

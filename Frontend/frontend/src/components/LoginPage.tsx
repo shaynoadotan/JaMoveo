@@ -21,16 +21,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin }) => {
       });
 
       // Check if the user is an admin
-      setIsAdmin(response.data.user.isAdmin); // Set admin status based on login response
-      
+      const isAdmin = response.data.user.isAdmin;
+      setIsAdmin(isAdmin); // Set admin status based on login response
+
       // Navigate to the appropriate page based on admin status
-      if (response.data.user.isAdmin) {
-        navigate('/admin'); // Redirect to admin page
+      if (isAdmin) {
+        navigate('/admin');  // Admin dashboard
       } else {
-        navigate('/player'); // Redirect to player page
+        navigate('/player'); // Player dashboard
       }
-      
-      alert('Login successful!');
+
     } catch (error) {
       console.error('Login error:', error);
       alert('Error in username or password');
