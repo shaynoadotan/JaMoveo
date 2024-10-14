@@ -34,25 +34,20 @@ io.on('connection', (socket) => {
   // Listen for song selection from admin
   socket.on('songSelected', (song) => {
     console.log('Song selected by admin:', song);
-    io.emit('songSelected', song); // Broadcast to all connected clients
+    io.emit('songSelected', song); // Emit the song to all connected clients
   });
 
-  // Listen for scrolling state changes
-  socket.on('scrollingStateChanged', (isScrolling) => {
-    console.log('Scrolling state changed:', isScrolling);
-    socket.broadcast.emit('scrollingStateChanged', isScrolling); // Broadcast to all clients except sender
-  });
-
-  // Listen for quit performance event from admin
-  socket.on('quitPerformance', () => {
-    console.log('Performance ended by admin');
-    io.emit('performanceEnded');
+  // Listen for scrolling toggle
+  socket.on('toggleScrolling', (shouldScroll) => {
+    console.log('Scrolling status changed:', shouldScroll);
+    io.emit('toggleScrolling', shouldScroll); // Emit the new scrolling status to all clients
   });
 
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
 });
+
 
 // Use Auth Routes
 app.use('/api', authRoutes);
