@@ -4,6 +4,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import authRoutes from './routes/auth'; // Adjust the path as necessary
 
 dotenv.config();
 
@@ -37,7 +38,10 @@ io.on('connection', (socket) => {
   });
   
 
+// Use Auth Routes
+app.use('/api', authRoutes);
+
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

@@ -1,10 +1,18 @@
-// import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 
-// const userSchema = new mongoose.Schema({
-//   username: { type: String, required: true, unique: true },
-//   password: { type: String, required: true },
-//   instrument: { type: String, required: true },
-//   role: { type: String, enum: ['admin', 'player'], default: 'player' },
-// });
+// Define the interface for the User document
+export interface IUser extends Document {
+  username: string;
+  password: string;
+  instrument: string;
+}
 
-// export default mongoose.model('User', userSchema);
+// Create the User schema
+const userSchema = new Schema<IUser>({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  instrument: { type: String, required: true },
+});
+
+// Export the model using the IUser interface
+export default mongoose.model<IUser>('User', userSchema);
