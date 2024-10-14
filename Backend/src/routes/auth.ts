@@ -30,28 +30,30 @@ router.post('/signup', async (req: Request, res: Response): Promise<void> => {
 });
 
 // Login Route
-router.post('/login', async (req: Request, res: Response): Promise<void> => {
+router.post('/login', async (req: Request, res: Response) : Promise<void> => {
   const { username, password } = req.body;
 
   try {
     // Check if user exists
-    const user: IUser | null = await User.findOne({ username });
+    const user = await User.findOne({ username });
     if (!user) {
-      res.status(400).json({ message: 'User not found' });
-      return;
+       res.status(400).json({ message: 'User not found' });
+       return;
     }
 
     // Validate password
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
-      res.status(400).json({ message: 'Invalid password' });
-      return;
+       res.status(400).json({ message: 'Invalid password' });
+       return;
     }
 
-    res.status(200).json({ message: 'Login successful!', user });
+    // Return user data including isAdmin
+    res.status(200).json({ message: 'Login successful!', user: { username: user.username, isAdmin: user.isAdmin } });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 export default router;
