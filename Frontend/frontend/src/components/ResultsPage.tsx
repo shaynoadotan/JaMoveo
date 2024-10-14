@@ -1,47 +1,71 @@
-import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
+
+// Import JSON data
+import heyJudeData from './hey_jude.json';
+import veechSheloData from './veech_shelo.json';
 
 interface Song {
   name: string;
   artist: string;
-  image?: string;
+  lines: Array<Array<{ lyrics: string; chords?: string }>>;
 }
 
 const ResultsPage: React.FC = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const { query } = location.state; // Get the search query passed from AdminPage
+  const [socket, setSocket] = useState<Socket | null>(null);
 
-  // Example static songs for demonstration
-  const songs: Song[] = [
-    { name: 'Hey Jude', artist: 'The Beatles', image: 'https://example.com/heyjude.jpg' },
-    { name: 'Imagine', artist: 'John Lennon', image: 'https://example.com/imagine.jpg' },
-  ].filter(song => song.name.toLowerCase().includes(query.toLowerCase())); // Filter based on query
+  useEffect(() => {
+    const newSocket = io('http://localhost:5000');
+    setSocket(newSocket);
+
+    newSocket.on('songSelected', (song: Song) => {
+      navigate('/live', { state: { song } });
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [navigate]);
+
+  const heyJude: Song = {
+    name: "Hey Jude",
+    artist: "The Beatles",
+    lines: heyJudeData
+  };
+
+  const veechShelo: Song = {
+    name: "Veech Shelo",
+    artist: "Unknown",
+    lines: veechSheloData
+  };
 
   const selectSong = (song: Song) => {
-    const socket = io('http://localhost:5000'); // Create socket connection
-    socket.emit('songSelected', song); // Emit selected song to server
-
-    // Admin navigates to the live page with selected song
-    navigate('/live', { state: { song } });
+    if (socket) {
+      socket.emit('songSelected', song);
+      navigate('/live', { state: { song } });
+    }
   };
 
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h5">Search Results</Typography>
-      {songs.length > 0 ? (
-        songs.map((song, index) => (
-          <Box key={index} sx={{ display: 'flex', alignItems: 'center', margin: 2 }}>
-            <img src={song.image || 'https://via.placeholder.com/150'} alt={song.name} style={{ width: '50px', marginRight: '10px' }} />
-            <Typography variant="body1">{song.name} by {song.artist}</Typography>
-            <Button variant="contained" onClick={() => selectSong(song)} sx={{ marginLeft: '10px' }}>Select Song</Button>
-          </Box>
-        ))
-      ) : (
-        <Typography>No songs found for your query.</Typography>
-      )}
+      
+      <Box sx={{ marginTop: 2 }}>
+        <Typography variant="h6">{heyJude.name} - {heyJude.artist}</Typography>
+        <Button variant="contained" onClick={() => selectSong(heyJude)} sx={{ marginTop: 1 }}>
+          Select "{heyJude.name}"
+        </Button>
+      </Box>
+
+      <Box sx={{ marginTop: 4 }}>
+        <Typography variant="h6">{veechShelo.name} - {veechShelo.artist}</Typography>
+        <Button variant="contained" onClick={() => selectSong(veechShelo)} sx={{ marginTop: 1 }}>
+          Select "{veechShelo.name}"
+        </Button>
+      </Box>
     </Box>
   );
 };

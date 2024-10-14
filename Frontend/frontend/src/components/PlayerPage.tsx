@@ -7,6 +7,20 @@ const PlayerPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const socket = io('http://localhost:5000');
+  
+    // Listen for performance ended event
+    socket.on('performanceEnded', () => {
+      alert('Performance ended. Redirecting back to main page.');
+      navigate('/player');
+    });
+  
+    return () => {
+      socket.disconnect(); // Cleanup on component unmount
+    };
+  }, [navigate]);
+  
+  useEffect(() => {
     const socket = io('http://localhost:5000'); // Connect to the Socket.io server
 
     // Listen for the 'songSelected' event from the admin

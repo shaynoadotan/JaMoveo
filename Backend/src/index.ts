@@ -4,12 +4,12 @@ import http from 'http';
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import authRoutes from './routes/auth'; // Adjust the path as necessary
+import authRoutes from './routes/auth';
 
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app); // Correctly create a shared server instance
+const server = http.createServer(app);
 
 // Middleware
 app.use(cors());
@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGO_URI!)
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000", // Your React app URL
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"]
   }
 });
@@ -34,14 +34,20 @@ io.on('connection', (socket) => {
   // Listen for song selection from admin
   socket.on('songSelected', (song) => {
     console.log('Song selected by admin:', song);
-    // Emit the song to all connected clients (players)
-    io.emit('songSelected', song);
+    io.emit('songSelected', song); // Emit the song to all connected clients
+  });
+
+  // Listen for scrolling toggle
+  socket.on('toggleScrolling', (shouldScroll) => {
+    console.log('Scrolling status changed:', shouldScroll);
+    io.emit('toggleScrolling', shouldScroll); // Emit the new scrolling status to all clients
   });
 
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
 });
+
 
 // Use Auth Routes
 app.use('/api', authRoutes);
@@ -53,6 +59,6 @@ app.use((req, res) => {
 
 // Start server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {  // Listen on the server object, not app
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
