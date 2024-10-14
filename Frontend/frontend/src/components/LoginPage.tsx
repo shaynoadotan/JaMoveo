@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const LoginPage: React.FC = () => {
+interface LoginPageProps {
+  setIsAdmin: (isAdmin: boolean) => void;  // Prop to update admin status in the parent
+}
+
+const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -12,6 +16,9 @@ const LoginPage: React.FC = () => {
         username,
         password,
       });
+
+      // Check if the user is an admin
+      setIsAdmin(response.data.user.isAdmin); // Set admin status based on login response
       alert('Login successful!');
     } catch (error) {
       console.error('Login error:', error);
