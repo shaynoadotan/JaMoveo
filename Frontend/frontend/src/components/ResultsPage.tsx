@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Box, Button, Typography } from '@mui/material';
 
 interface Song {
   name: string;
@@ -19,24 +20,25 @@ const ResultsPage: React.FC = () => {
   ].filter(song => song.name.toLowerCase().includes(query.toLowerCase())); // Filter based on query
 
   const selectSong = (song: Song) => {
-    // Emit event to socket server for live page transition
     alert(`Selected song: ${song.name} by ${song.artist}`);
     navigate('/live', { state: { song } }); // Navigate to live page with selected song
   };
 
   return (
-    <div>
-      <h2>Search Results</h2>
-      <ul>
-        {songs.map((song, index) => (
-          <li key={index}>
-            <img src={song.image || 'https://via.placeholder.com/150'} alt={song.name} />
-            <p>{song.name} by {song.artist}</p>
-            <button onClick={() => selectSong(song)}>Select Song</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Box sx={{ padding: 4 }}>
+      <Typography variant="h5">Search Results</Typography>
+      {songs.length > 0 ? (
+        songs.map((song, index) => (
+          <Box key={index} sx={{ display: 'flex', alignItems: 'center', margin: 2 }}>
+            <img src={song.image || 'https://via.placeholder.com/150'} alt={song.name} style={{ width: '50px', marginRight: '10px' }} />
+            <Typography variant="body1">{song.name} by {song.artist}</Typography>
+            <Button variant="contained" onClick={() => selectSong(song)} sx={{ marginLeft: '10px' }}>Select Song</Button>
+          </Box>
+        ))
+      ) : (
+        <Typography>No songs found for your query.</Typography>
+      )}
+    </Box>
   );
 };
 

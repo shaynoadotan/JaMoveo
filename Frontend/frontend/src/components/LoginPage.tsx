@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Box, Button, TextField, Typography } from '@mui/material';
 
 interface LoginPageProps {
   setIsAdmin: (isAdmin: boolean) => void;  // Prop to set admin status in the parent
@@ -9,7 +10,7 @@ interface LoginPageProps {
 const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();  // Use navigate to control page routing
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,24 +38,29 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin }) => {
   };
 
   return (
-    <form onSubmit={handleLogin}>
-      <h2>Login</h2>
-      <input
-        type="text"
-        placeholder="Username"
+    <Box component="form" onSubmit={handleLogin} sx={{ padding: 4 }}>
+      <Typography variant="h5">Login</Typography>
+      <TextField
+        label="Username"
+        variant="outlined"
+        fullWidth
+        margin="normal"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         required
       />
-      <input
+      <TextField
+        label="Password"
         type="password"
-        placeholder="Password"
+        variant="outlined"
+        fullWidth
+        margin="normal"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <button type="submit">Login</button>
-    </form>
+      <Button type="submit" variant="contained" fullWidth>Login</Button>
+    </Box>
   );
 };
 
