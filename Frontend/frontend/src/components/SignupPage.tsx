@@ -9,14 +9,16 @@ const SignupPage: React.FC = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/signup', {
+      // Send signup data to the backend
+      const response = await axios.post('http://localhost:5000/api/signup', {
         username,
         password,
-        instrument,
+        instrument
       });
       alert('Signup successful!');
     } catch (error) {
       console.error('Signup error:', error);
+      alert('Error signing up.');
     }
   };
 
@@ -42,11 +44,10 @@ const SignupPage: React.FC = () => {
         onChange={(e) => setInstrument(e.target.value)}
         required
       >
-        <option value="" disabled>Select Instrument</option>
+        <option value="">Select Instrument</option>
         <option value="Guitar">Guitar</option>
         <option value="Vocals">Vocals</option>
         <option value="Drums">Drums</option>
-        {/* Add more instruments as needed */}
       </select>
       <button type="submit">Signup</button>
     </form>
