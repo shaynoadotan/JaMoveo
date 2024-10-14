@@ -1,16 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Box, Button, Typography } from '@mui/material';
 
 const SignupPage: React.FC<{ setIsAdmin: (isAdmin: boolean) => void }> = ({ setIsAdmin }) => {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <h1>Signup</h1>
-      <button onClick={() => navigate('/adminsignup')}>Admin Signup</button>
-      <button onClick={() => navigate('/playersignup')}>Player Signup</button>
-      <button onClick={() => navigate('/login')}>Login</button>
-    </div>
+    <Box sx={{ textAlign: 'center', padding: 4 }}>
+      <Typography variant="h4" gutterBottom>Signup</Typography>
+      <Button variant="contained" onClick={() => navigate('/adminsignup')} sx={{ margin: 1 }}>Admin Signup</Button>
+      <Button variant="contained" onClick={() => navigate('/playersignup')} sx={{ margin: 1 }}>Player Signup</Button>
+      <Button variant="contained" onClick={() => navigate('/login')} sx={{ margin: 1 }}>Login</Button>
+    </Box>
   );
 };
 

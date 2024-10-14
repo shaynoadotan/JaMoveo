@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Box, Button, TextField, Typography } from '@mui/material';
 
 const PlayerSignupPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -23,34 +24,38 @@ const PlayerSignupPage: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSignup}>
-      <h2>Player Signup</h2>
-      <input
-        type="text"
-        placeholder="Username"
+    <Box component="form" onSubmit={handleSignup} sx={{ padding: 4 }}>
+      <Typography variant="h5">Player Signup</Typography>
+      <TextField
+        label="Username"
+        variant="outlined"
+        fullWidth
+        margin="normal"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         required
       />
-      <input
+      <TextField
+        label="Password"
         type="password"
-        placeholder="Password"
+        variant="outlined"
+        fullWidth
+        margin="normal"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <select
+      <TextField
+        label="Instrument"
+        variant="outlined"
+        fullWidth
+        margin="normal"
         value={instrument}
         onChange={(e) => setInstrument(e.target.value)}
         required
-      >
-        <option value="">Select Instrument</option>
-        <option value="Guitar">Guitar</option>
-        <option value="Vocals">Vocals</option>
-        <option value="Drums">Drums</option>
-      </select>
-      <button type="submit">Signup</button>
-    </form>
+      />
+      <Button type="submit" variant="contained" fullWidth>Signup</Button>
+    </Box>
   );
 };
 
