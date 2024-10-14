@@ -15,8 +15,8 @@ interface Song {
 }
 
 interface LivePageProps {
-  isAdmin: boolean; // Pass this from the parent component (App.tsx)
-  isSinger: boolean; // Pass this from the parent component (App.tsx)
+  isAdmin: boolean;  // Prop to check if the user is an admin
+  isSinger: boolean; // Prop to check if the user is a singer
 }
 
 const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
@@ -25,7 +25,6 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
   const { song: initialSong } = location.state || { song: null }; // Ensure song is passed from previous page
   const [song, setSong] = useState<Song | null>(initialSong); // State to hold the current song
   const [isScrolling, setIsScrolling] = useState(false);
-  const [scrollSpeed] = useState(1); // Speed of scroll
   const [scrollInterval, setScrollInterval] = useState<NodeJS.Timeout | null>(null);
 
   // Function to start/stop automatic scrolling
@@ -47,6 +46,21 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (isScrolling) {
+      const interval = setInterval(() => {
+        window.scrollBy(0, 1); // Scroll down 1 pixel
+      }, 100); // Adjust speed by changing the delay
+      setScrollInterval(interval);
+    } else if (scrollInterval) {
+      clearInterval(scrollInterval);
+    }
+
+    return () => {
+      if (scrollInterval) clearInterval(scrollInterval);
+    };
+  }, [isScrolling, scrollInterval]);
+
   // Function to quit live performance (admin only)
   const handleQuit = () => {
     const socket = io('http://localhost:5000'); // Connect to the server
@@ -55,7 +69,7 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
   };
 
   // Render function for each song line
-  const renderSongLine = (line: SongLine[], isSinger: boolean) => (
+  const renderSongLine = (line: SongLine[]) => (
     <Box key={line.map((word) => word.lyrics).join(' ')} sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
       {line.map((word, index) => (
         <Typography
@@ -68,7 +82,7 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
             margin: '0 10px',
           }}
         >
-          {isSinger ? word.lyrics : word.chords ? `${word.chords} ${word.lyrics}` : word.lyrics}
+          {word.chords ? `${word.chords} ${word.lyrics}` : word.lyrics}
         </Typography>
       ))}
     </Box>
@@ -96,10 +110,10 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
 
       {/* Render song lines */}
       <Box sx={{ textAlign: 'center', margin: '20px 0' }}>
-        {song.lines.map((line: SongLine[], index: number) => renderSongLine(line, isSinger))}
+        {song.lines.map((line: SongLine[]) => renderSongLine(line))}
       </Box>
 
-      {/* Floating button to toggle auto-scrolling */}
+      {/* Floating button to toggle auto-scrolling for both admin and player */}
       <Box sx={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 100 }}>
         <Button
           variant="contained"
