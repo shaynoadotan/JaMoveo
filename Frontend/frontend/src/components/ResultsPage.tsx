@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
+import { io } from 'socket.io-client';
 
 interface Song {
   name: string;
@@ -20,8 +21,11 @@ const ResultsPage: React.FC = () => {
   ].filter(song => song.name.toLowerCase().includes(query.toLowerCase())); // Filter based on query
 
   const selectSong = (song: Song) => {
-    alert(`Selected song: ${song.name} by ${song.artist}`);
-    navigate('/live', { state: { song } }); // Navigate to live page with selected song
+    const socket = io('http://localhost:5000'); // Create socket connection
+    socket.emit('songSelected', song); // Emit selected song to server
+
+    // Admin navigates to the live page with selected song
+    navigate('/live', { state: { song } });
   };
 
   return (
