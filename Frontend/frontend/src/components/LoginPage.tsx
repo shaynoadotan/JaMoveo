@@ -1,19 +1,21 @@
-import React, { useState, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState } from 'react';
 import axios from 'axios';
 
 const LoginPage: React.FC = () => {
-  const { setUser } = useContext(AuthContext); // Now TypeScript will recognize setUser
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/login', { username, password });
-      setUser(username);  // Set the logged-in user
+      const response = await axios.post('http://localhost:5000/api/login', {
+        username,
+        password,
+      });
+      alert('Login successful!');
     } catch (error) {
       console.error('Login error:', error);
+      alert('Error in username or password');
     }
   };
 
