@@ -37,7 +37,10 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
   };
 
   useEffect(() => {
-    const socketInstance = io('http://localhost:5000'); // Connect to the server
+    // Connect to the server and listen for events
+    const socketInstance = io('http://localhost:5000'); 
+
+    // Listen for song selection updates from the admin
     socketInstance.on('songSelected', (newSong: Song) => {
       console.log('New song selected:', newSong); // For debugging purposes
       setSong(newSong); // Update state with the new song selected by admin
@@ -46,27 +49,25 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
     // Listen for scrolling toggle from the server
     socketInstance.on('toggleScrolling', (shouldScroll: boolean) => {
       setIsScrolling(shouldScroll);
+      if (shouldScroll) {
+        // Start scrolling when shouldScroll is true
+        const interval = setInterval(() => {
+          window.scrollBy(0, 1); // Scroll down 1 pixel
+        }, 100); // Adjust speed by changing the delay
+        setScrollInterval(interval);
+      } else {
+        // Stop scrolling when shouldScroll is false
+        if (scrollInterval) {
+          clearInterval(scrollInterval);
+          setScrollInterval(null);
+        }
+      }
     });
 
     return () => {
       socketInstance.disconnect(); // Clean up socket connection on unmount
     };
-  }, []);
-
-  useEffect(() => {
-    if (isScrolling) {
-      const interval = setInterval(() => {
-        window.scrollBy(0, 1); // Scroll down 1 pixel
-      }, 100); // Adjust speed by changing the delay
-      setScrollInterval(interval);
-    } else if (scrollInterval) {
-      clearInterval(scrollInterval);
-    }
-
-    return () => {
-      if (scrollInterval) clearInterval(scrollInterval);
-    };
-  }, [isScrolling, scrollInterval]);
+  }, [scrollInterval]); // Add scrollInterval as dependency
 
   // Function to quit live performance (admin only)
   const handleQuit = () => {
@@ -94,7 +95,6 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
     </Box>
   );
 
-  // Check if song is not available yet
   if (!song) {
     return <Typography variant="h4">Waiting for the next song...</Typography>;
   }
