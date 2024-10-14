@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: '*' } });
+// const io = new Server(server, { cors: { origin: '*' } });
 
 app.use(cors());
 app.use(express.json());
@@ -20,23 +20,42 @@ mongoose.connect(process.env.MONGO_URI!)
   .then(() => console.log('MongoDB connected'))
   .catch((error) => console.log('MongoDB connection error:', error));
 
-io.on('connection', (socket) => {
-  console.log('a user connected');
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
+// io.on('connection', (socket) => {
+//   console.log('a user connected');
+//   socket.on('disconnect', () => {
+//     console.log('user disconnected');
+//   });
+// });
+
+// io.on('connection', (socket) => {
+//     socket.on('joinSession', (sessionId) => {
+//       socket.join(sessionId);
+//     });
+  
+//     socket.on('selectSong', (songData) => {
+//       io.to(songData.sessionId).emit('songSelected', songData);
+//     });
+//   });
+  
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // Your React app URL
+    methods: ["GET", "POST"]
+  }
 });
 
 io.on('connection', (socket) => {
-    socket.on('joinSession', (sessionId) => {
-      socket.join(sessionId);
-    });
-  
-    socket.on('selectSong', (songData) => {
-      io.to(songData.sessionId).emit('songSelected', songData);
-    });
+  console.log('A user connected');
+
+  socket.on('songSelected', (song) => {
+    socket.broadcast.emit('songSelected', song); // Broadcast the selected song to all clients
   });
-  
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+});
+
 
 // Use Auth Routes
 app.use('/api', authRoutes);
