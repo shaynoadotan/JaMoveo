@@ -1,28 +1,34 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Box, Button, TextField, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const AdminPage: React.FC = () => {
-  const [query, setQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate('/results', { state: { query } }); // Pass the search query to results page
+  const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      alert('Please enter a valid search term.'); // Alert for empty query
+      return;
+    }
+    // Navigate to the results page with the search query
+    navigate('/results', { state: { query: searchQuery } });
   };
 
   return (
-    <Box component="form" onSubmit={handleSearch} sx={{ padding: 4 }}>
-      <Typography variant="h5">Search any song...</Typography>
+    <Box sx={{ padding: 4 }}>
+      <Typography variant="h5">Admin Page</Typography>
       <TextField
-        label="Song Name"
+        label="Search Songs"
         variant="outlined"
         fullWidth
         margin="normal"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
       />
-      <Button type="submit" variant="contained" fullWidth>Search</Button>
+      <Button variant="contained" onClick={handleSearch}>
+        Search
+      </Button>
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
 import { io, Socket } from 'socket.io-client';
 
@@ -14,38 +14,50 @@ interface Song {
 }
 
 const ResultsPage: React.FC = () => {
-  const navigate = useNavigate();
+  const location = useLocation();
+  const searchQuery = location.state?.query || ''; // Get the search query from location state
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [filteredSongs, setFilteredSongs] = useState<Song[]>([]); // State to hold filtered songs
 
   useEffect(() => {
     const newSocket = io('http://localhost:5000');
     setSocket(newSocket);
 
     newSocket.on('songSelected', (song: Song) => {
-      navigate('/live', { state: { song } });
+      // Handle song selection
     });
 
     return () => {
       newSocket.disconnect();
     };
-  }, [navigate]);
+  }, []);
 
   const heyJude: Song = {
     name: "Hey Jude",
     artist: "The Beatles",
-    lines: heyJudeData
+    lines: heyJudeData,
   };
 
   const veechShelo: Song = {
     name: "Veech Shelo",
     artist: "Unknown",
-    lines: veechSheloData
+    lines: veechSheloData,
   };
+
+  // Function to filter songs based on search query
+  const filterSongs = (query: string) => {
+    const allSongs = [heyJude, veechShelo];
+    return allSongs.filter(song => song.name.toLowerCase().includes(query.toLowerCase()));
+  };
+
+  useEffect(() => {
+    setFilteredSongs(filterSongs(searchQuery)); // Filter songs based on the search query
+  }, [searchQuery]);
 
   const selectSong = (song: Song) => {
     if (socket) {
       socket.emit('songSelected', song);
-      navigate('/live', { state: { song } });
+      // Navigate to live page with selected song
     }
   };
 
@@ -53,19 +65,19 @@ const ResultsPage: React.FC = () => {
     <Box sx={{ padding: 4 }}>
       <Typography variant="h5">Search Results</Typography>
       
-      <Box sx={{ marginTop: 2 }}>
-        <Typography variant="h6">{heyJude.name} - {heyJude.artist}</Typography>
-        <Button variant="contained" onClick={() => selectSong(heyJude)} sx={{ marginTop: 1 }}>
-          Select "{heyJude.name}"
-        </Button>
-      </Box>
-
-      <Box sx={{ marginTop: 4 }}>
-        <Typography variant="h6">{veechShelo.name} - {veechShelo.artist}</Typography>
-        <Button variant="contained" onClick={() => selectSong(veechShelo)} sx={{ marginTop: 1 }}>
-          Select "{veechShelo.name}"
-        </Button>
-      </Box>
+      {/* Display filtered songs */}
+      {filteredSongs.length > 0 ? (
+        filteredSongs.map((song, index) => (
+          <Box key={index} sx={{ marginTop: 2 }}>
+            <Typography variant="h6">{song.name} - {song.artist}</Typography>
+            <Button variant="contained" onClick={() => selectSong(song)} sx={{ marginTop: 1 }}>
+              Select "{song.name}"
+            </Button>
+          </Box>
+        ))
+      ) : (
+        <Typography variant="body1" sx={{ marginTop: 2 }}>No songs found.</Typography>
+      )}
     </Box>
   );
 };
