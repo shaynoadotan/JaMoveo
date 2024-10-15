@@ -37,12 +37,10 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
   };
 
   useEffect(() => {
-    // Connect to the server and listen for events
-    const socketInstance = io('http://localhost:5000'); 
+    const socketInstance = io('http://localhost:5000');
 
     // Listen for song selection updates from the admin
     socketInstance.on('songSelected', (newSong: Song) => {
-      console.log('New song selected:', newSong); // For debugging purposes
       setSong(newSong); // Update state with the new song selected by admin
     });
 
@@ -50,13 +48,11 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
     socketInstance.on('toggleScrolling', (shouldScroll: boolean) => {
       setIsScrolling(shouldScroll);
       if (shouldScroll) {
-        // Start scrolling when shouldScroll is true
         const interval = setInterval(() => {
           window.scrollBy(0, 1); // Scroll down 1 pixel
         }, 100); // Adjust speed by changing the delay
         setScrollInterval(interval);
       } else {
-        // Stop scrolling when shouldScroll is false
         if (scrollInterval) {
           clearInterval(scrollInterval);
           setScrollInterval(null);
@@ -64,15 +60,29 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
       }
     });
 
+    // Listen for "quitPerformance" event and navigate based on the client's own role
+    socketInstance.on('quitPerformance', () => {
+      if (isAdmin) {
+        navigate('/admin'); // If the client is an admin, redirect to the admin page
+      } else {
+        navigate('/player'); // If the client is a player, redirect to the player page
+      }
+    });
+
     return () => {
       socketInstance.disconnect(); // Clean up socket connection on unmount
     };
-  }, [scrollInterval]); // Add scrollInterval as dependency
+  }, [isAdmin, navigate, scrollInterval]);
+
+  useEffect(() => {
+    return () => {
+      if (scrollInterval) clearInterval(scrollInterval);
+    };
+  }, [scrollInterval]);
 
   // Function to quit live performance (admin only)
   const handleQuit = () => {
-    socket.emit('quitPerformance'); // Emit the quit event to all players
-    navigate('/admin'); // Redirect admin and players to the main page
+    socket.emit('quitPerformance'); // Admin emits the quit event
   };
 
   // Render function for each song line
@@ -103,8 +113,8 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
     <Box
       sx={{
         padding: 4,
-        backgroundColor: '#000', // Black background for high contrast
-        color: '#fff', // White text for contrast
+        backgroundColor: '#000',
+        color: '#fff',
         minHeight: '100vh',
         overflow: 'hidden',
         position: 'relative',
@@ -115,7 +125,6 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
         {song.name} by {song.artist}
       </Typography>
 
-      {/* Render song lines */}
       <Box sx={{ textAlign: 'center', margin: '20px 0' }}>
         {song.lines.map((line: SongLine[]) => renderSongLine(line))}
       </Box>
