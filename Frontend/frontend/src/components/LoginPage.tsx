@@ -4,12 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button, TextField, Typography } from '@mui/material';
 
 interface LoginPageProps {
-  setIsAdmin: (isAdmin: boolean) => void;  // Prop to set admin status in the parent
+  setIsAdmin: (isAdmin: boolean) => void; // Prop to set admin status in the parent
   setRole: (role: 'singer' | 'player') => void; // Prop to set the user role
+  setUsername: (username: string) => void; // Added prop to set the username
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin, setRole }) => {
-  const [username, setUsername] = useState('');
+const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin, setRole, setUsername }) => {
+  const [username, setUsernameLocal] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
@@ -24,6 +25,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin, setRole }) => {
       const { isAdmin, role } = response.data.user; // Extract role from response
       setIsAdmin(isAdmin); // Set admin status based on login response
       setRole(role); // Set user role based on login response
+      setUsername(username); // Set username on login
 
       // Navigate to the appropriate page based on admin status
       if (isAdmin) {
@@ -46,7 +48,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin, setRole }) => {
         fullWidth
         margin="normal"
         value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        onChange={(e) => setUsernameLocal(e.target.value)}
         required
       />
       <TextField

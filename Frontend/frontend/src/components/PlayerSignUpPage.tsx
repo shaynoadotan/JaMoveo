@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, Radio, RadioGroup, FormControlLabel } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { Box, Button, TextField, Typography } from '@mui/material';
 
-const PlayerSignUpPage: React.FC = () => {
-  const [username, setUsername] = useState('');
+interface PlayerSignUpPageProps {
+  setUsername: (username: string) => void; // Prop to set the username
+}
+
+const PlayerSignUpPage: React.FC<PlayerSignUpPageProps> = ({ setUsername }) => {
+  const [username, setUsernameLocal] = useState('');
   const [password, setPassword] = useState('');
   const [instrument, setInstrument] = useState('');
-  const [role, setRole] = useState('singer'); // Default role
+  const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,10 +20,12 @@ const PlayerSignUpPage: React.FC = () => {
         username,
         password,
         instrument,
-        isAdmin: false, // This is a player signup
-        role // Add role to the signup request
+        isAdmin: false, // Specify that this is a player signup
+        role: 'player', // Set role to player
       });
+      setUsername(username); // Set the username on successful signup
       alert('Player account created successfully');
+      navigate('/player'); // Redirect to player page
     } catch (error) {
       console.error('Signup error:', error);
       alert('Error during signup');
@@ -34,7 +41,7 @@ const PlayerSignUpPage: React.FC = () => {
         fullWidth
         margin="normal"
         value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        onChange={(e) => setUsernameLocal(e.target.value)}
         required
       />
       <TextField
@@ -56,12 +63,6 @@ const PlayerSignUpPage: React.FC = () => {
         onChange={(e) => setInstrument(e.target.value)}
         required
       />
-
-      <RadioGroup value={role} onChange={(e) => setRole(e.target.value)}>
-        <FormControlLabel value="singer" control={<Radio />} label="Singer" />
-        <FormControlLabel value="player" control={<Radio />} label="Player" />
-      </RadioGroup>
-
       <Button type="submit" variant="contained" fullWidth>
         Sign Up
       </Button>

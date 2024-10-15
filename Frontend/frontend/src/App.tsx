@@ -10,18 +10,27 @@ import ResultsPage from './components/ResultsPage';
 import LivePage from './components/LivePage';
 import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
 import UnauthorizedPage from './components/UnauthorizedPage'; // Import UnauthorizedPage
+import Navbar from './components/Navbar'; // Import the Navbar
 
 function App() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null); // Track admin status
   const [role, setRole] = useState<'singer' | 'player' | null>(null); // Track user role
+  const [username, setUsername] = useState<string | null>(null); // Track logged-in username
+
+  const handleLogout = () => {
+    setIsAdmin(null); // Clear admin status
+    setRole(null); // Clear role
+    setUsername(null); // Clear username
+  };
 
   return (
     <Router>
+      <Navbar username={username} onLogout={handleLogout} /> {/* Add Navbar */}
       <Routes>
-        <Route path="/signup" element={<SignupPage setIsAdmin={setIsAdmin} />} />
-        <Route path="/playersignup" element={<PlayerSignupPage />} />
-        <Route path="/adminsignup" element={<AdminSignupPage />} />
-        <Route path="/login" element={<LoginPage setIsAdmin={setIsAdmin} setRole={setRole} />} />
+        <Route path="/signup" element={<SignupPage setIsAdmin={setIsAdmin} setUsername={setUsername} />} />
+        <Route path="/playersignup" element={<PlayerSignupPage setUsername={setUsername} />} />
+        <Route path="/adminsignup" element={<AdminSignupPage setUsername={setUsername} />} />
+        <Route path="/login" element={<LoginPage setIsAdmin={setIsAdmin} setRole={setRole} setUsername={setUsername} />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} /> {/* Add Unauthorized page */}
 
         {/* Protected admin routes */}
@@ -31,7 +40,7 @@ function App() {
         {/* Pass role to LivePage */}
         <Route path="/live" element={<LivePage isAdmin={!!isAdmin} isSinger={role === 'singer'} role={role!} />} />
         <Route path="/player" element={<PlayerPage />} /> {/* No conditional Navigate here */}
-        <Route path="/" element={<SignupPage setIsAdmin={setIsAdmin} />} /> {/* Set initial page */}
+        <Route path="/" element={<SignupPage setIsAdmin={setIsAdmin} setUsername={setUsername} />} /> {/* Set initial page */}
       </Routes>
     </Router>
   );
