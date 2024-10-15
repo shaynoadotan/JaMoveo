@@ -2,15 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, TextField, Typography, Modal } from '@mui/material';
+import { User } from '../App';
 
 interface LoginPageProps {
-  setIsAdmin: (isAdmin: boolean) => void;
-  setRole: (role: 'singer' | 'player' | null) => void;
-  setUsername: (username: string | null) => void;
+  setUser: (user: User | null) => void;
   isLoggedIn: boolean; // New prop to check if the user is logged in
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin, setRole, setUsername, isLoggedIn }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ setUser, isLoggedIn }) => {
   const [username, setUsernameState] = useState('');
   const [password, setPassword] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -36,10 +35,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin, setRole, setUsername,
       });
 
       const isAdmin = response.data.user.isAdmin;
-      const role = response.data.user.role; // Assuming the role is returned in the response
-      setIsAdmin(isAdmin);
-      setRole(role);
-      setUsername(username); // Set username on login
+      const instrument = response.data.user.instrument;
+      setUser({username, isAdmin, instrument}); // Set username on login
 
       if (isAdmin) {
         navigate('/admin');

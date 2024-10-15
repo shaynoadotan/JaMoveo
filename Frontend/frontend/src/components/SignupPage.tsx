@@ -1,16 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
+import { User } from '../App';
 
 interface SignupPageProps {
-  setIsAdmin: (isAdmin: boolean) => void;
-  setUsername: (username: string) => void; // Added prop for username
+  setUser: (user: User) => void;
 }
 
-const SignupPage: React.FC<SignupPageProps> = ({ setIsAdmin, setUsername }) => {
+const SignupPage: React.FC<SignupPageProps> = ({ setUser }) => {
   const navigate = useNavigate();
-
-
   return (
     <Box sx={{ textAlign: 'center', padding: 4 }}>
       <Typography variant="h4" gutterBottom>Signup</Typography>

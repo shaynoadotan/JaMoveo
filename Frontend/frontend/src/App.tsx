@@ -13,43 +13,46 @@ import UnauthorizedPage from './components/UnauthorizedPage';
 import Navbar from './components/Navbar';
 import { Modal, Box, Typography, Button } from '@mui/material';
 
+export interface User {
+  username: string;
+  isAdmin: boolean;
+  instrument: string;
+}
+
 function App() {
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<'singer' | 'player' | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleLogout = () => {
-    setIsAdmin(null);
-    setRole(null);
-    setUsername(null);
+    setUser(null);
   };
 
-  const isLoggedIn = !!username;
+  const isLoggedIn = user != null;
 
   return (
     <Router>
-      <Navbar username={username} onLogout={handleLogout} isAdmin={isAdmin === true} />
+      <Navbar username={user?.username || null} onLogout={handleLogout} isAdmin={user?.isAdmin === true} />
       <Routes>
         <Route path="/signup" element={
           isLoggedIn ? (
             <Navigate to={role === 'player' ? '/player' : '/admin'} />
           ) : (
-            <SignupPage setIsAdmin={setIsAdmin} setUsername={setUsername} />
+            <SignupPage setUser={setUser} />
           )
         } />
         <Route path="/playersignup" element={
           isLoggedIn ? (
             <Navigate to="/player" />
           ) : (
-            <PlayerSignupPage setUsername={setUsername} />
+            <PlayerSignupPage setUser={setUser} />
           )
         } />
         <Route path="/adminsignup" element={
           isLoggedIn ? (
             <Navigate to="/admin" />
           ) : (
-            <AdminSignupPage setUsername={setUsername} />
+            <AdminSignupPage setUser={setUser} />
           )
         } />
 
@@ -57,7 +60,7 @@ function App() {
           isLoggedIn ? (
             <Navigate to={role === 'player' ? '/player' : '/admin'} />
           ) : (
-            <LoginPage setIsAdmin={setIsAdmin} setRole={setRole} setUsername={setUsername} isLoggedIn={isLoggedIn} />
+            <LoginPage setUser={setUser} isLoggedIn={isLoggedIn} />
           )
         } />
 
@@ -65,14 +68,14 @@ function App() {
 
         <Route path="/admin" element={
           isLoggedIn ? (
-            <ProtectedRoute isAdmin={!!isAdmin}><AdminPage /></ProtectedRoute>
+            <ProtectedRoute isAdmin={!!user?.isAdmin}><AdminPage /></ProtectedRoute>
           ) : (
             <Navigate to="/login" />
           )
         } />
         <Route path="/results" element={
           isLoggedIn ? (
-            <ProtectedRoute isAdmin={!!isAdmin}><ResultsPage /></ProtectedRoute>
+            <ProtectedRoute isAdmin={!!user?.isAdmin}><ResultsPage /></ProtectedRoute>
           ) : (
             <Navigate to="/login" />
           )
@@ -80,7 +83,7 @@ function App() {
         
         <Route path="/live" element={
           isLoggedIn ? (
-            <LivePage isAdmin={!!isAdmin} isSinger={role === 'singer'} role={role!} />
+            <LivePage isAdmin={!!user?.isAdmin} isSinger={user?.instrument === 'singer'} />
           ) : (
             <Navigate to="/login" />
           )
@@ -92,7 +95,7 @@ function App() {
             <Navigate to="/login" />
           )
         } />
-        <Route path="/" element={<SignupPage setIsAdmin={setIsAdmin} setUsername={setUsername} />} />
+        <Route path="/" element={<SignupPage setUser={setUser} />} />
       </Routes>
 
       {/* Modal for already logged in */}
