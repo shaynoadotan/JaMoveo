@@ -15,11 +15,13 @@ interface Song {
 }
 
 interface LivePageProps {
-  isAdmin: boolean;  // Prop to check if the user is an admin
-  isSinger: boolean; // Prop to check if the user is a singer
+  isAdmin: boolean; // Check if the user is an admin
+  isSinger: boolean; // Check if the user is a singer
+  role: 'singer' | 'player'; // Role of the user
 }
 
-const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
+
+const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger, role }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { song: initialSong } = location.state || { song: null }; // Ensure song is passed from previous page
@@ -60,12 +62,12 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
       }
     });
 
-    // Listen for "quitPerformance" event and navigate based on the client's own role
+    // Listen for "quitPerformance" event and navigate users based on their role
     socketInstance.on('quitPerformance', () => {
       if (isAdmin) {
-        navigate('/admin'); // If the client is an admin, redirect to the admin page
+        navigate('/admin'); // Redirect admin to the admin page
       } else {
-        navigate('/player'); // If the client is a player, redirect to the player page
+        navigate('/player'); // Redirect players to the player page
       }
     });
 
@@ -85,7 +87,7 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
     socket.emit('quitPerformance'); // Admin emits the quit event
   };
 
-  // Render function for each song line
+  // Render function for each song line based on user role
   const renderSongLine = (line: SongLine[]) => (
     <Box key={line.map((word) => word.lyrics).join(' ')} sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
       {line.map((word, index) => (
@@ -99,7 +101,8 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger }) => {
             margin: '0 10px',
           }}
         >
-          {word.chords ? `${word.chords} ${word.lyrics}` : word.lyrics}
+          {/* Use role from the props to determine what to display */}
+          {role === 'singer' ? word.lyrics : word.chords ? `${word.chords} ${word.lyrics}` : word.lyrics}
         </Typography>
       ))}
     </Box>
