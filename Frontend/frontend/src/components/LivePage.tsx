@@ -30,9 +30,12 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger, role }) => {
   const [scrollInterval, setScrollInterval] = useState<NodeJS.Timeout | null>(null);
   const socket = io('http://localhost:5000'); // Connect to the server
 
+  socket.on('toggleScrolling', (scroll: boolean) => {
+    setIsScrolling(scroll);
+  });
+
   // Function to start/stop automatic scrolling
   const toggleScrolling = () => {
-    setIsScrolling((prev) => !prev);
     socket.emit('toggleScrolling', !isScrolling); // Emit scrolling state to all users
   };
 
@@ -104,19 +107,19 @@ const LivePage: React.FC<LivePageProps> = ({ isAdmin, isSinger, role }) => {
 
       {/* Quit button (admin only) */}
       {isAdmin && (
-        <Box sx={{ position: 'fixed', top: '20px', right: '20px', zIndex: 100 }}>
-          <Button variant="contained" color="error" onClick={handleQuit}>
+        <Box sx={{ position: 'fixed', bottom: '60px', right: '20px', zIndex: 100, width: 170 }}>
+          <Button sx={{width: 170}} variant="contained" color="error" onClick={handleQuit}>
             Quit
           </Button>
         </Box>
       )}
 
       {/* Floating button to toggle auto-scrolling */}
-      <Box sx={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 100 }}>
+      <Box sx={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 100, width: 170 }}>
         <Button
           variant="contained"
           onClick={toggleScrolling}
-          sx={{ backgroundColor: isScrolling ? 'red' : 'green' }}
+          sx={{ width: 170, backgroundColor: isScrolling ? 'red' : 'green' }}
         >
           {isScrolling ? 'Stop Scrolling' : 'Start Scrolling'}
         </Button>
