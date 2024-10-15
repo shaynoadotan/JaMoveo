@@ -4,7 +4,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import authRoutes from './netlify/functions/auth';
+import authRoutes from './netlify/functions/api';
 
 dotenv.config();
 
