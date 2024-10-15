@@ -25,7 +25,6 @@ const PlayerPage: React.FC = () => {
 
     // Listen for the 'songSelected' event from the admin
     socket.on('songSelected', (song) => {
-      console.log('Song received:', song); // For debugging
       // Navigate to the live page with the selected song
       navigate('/live', { state: { song } });
     });

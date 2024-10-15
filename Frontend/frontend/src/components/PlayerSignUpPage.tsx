@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+
 import axios from 'axios';
+import { User } from '../App';
 
 interface PlayerSignupPageProps {
-  setUsername: (username: string) => void;
+  setUser: (user: User) => void;
 }
 
-const PlayerSignupPage: React.FC<PlayerSignupPageProps> = ({ setUsername }) => {
+const PlayerSignupPage: React.FC<PlayerSignupPageProps> = ({ setUser }) => {
   const [username, setUsernameState] = useState('');
   const [password, setPassword] = useState('');
   const [instrument, setInstrument] = useState('');
@@ -21,12 +23,15 @@ const PlayerSignupPage: React.FC<PlayerSignupPageProps> = ({ setUsername }) => {
     }
 
     try {
-      await axios.post('http://localhost:5000/api/playersignup', {
+      const isAdmin = false;
+      await axios.post('http://localhost:5000/api/signup', {
         username,
         password,
         instrument,
+        isAdmin, 
+        role: "player"
       });
-      setUsername(username); // Set the username on successful signup
+      setUser({username, instrument, isAdmin}); // Set the username on successful signup
       alert('Player account created successfully');
       navigate('/player'); // Redirect to player page
     } catch (error) {
@@ -57,15 +62,22 @@ const PlayerSignupPage: React.FC<PlayerSignupPageProps> = ({ setUsername }) => {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <TextField
-        label="Instrument"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={instrument}
-        onChange={(e) => setInstrument(e.target.value)}
-        required
-      />
+      <FormControl fullWidth>
+        <InputLabel id="instrument-select-label">Instrument</InputLabel>
+        <Select
+          labelId="instrument-select-label"
+          id="instrument-select"
+          value={instrument}
+          label="Instrument"
+          onChange={(e) => setInstrument(e.target.value)}
+        >
+          <MenuItem value="singer">Singer</MenuItem>
+          <MenuItem value="guitar">Guitar</MenuItem>
+          <MenuItem value="bass">Bass</MenuItem>
+          <MenuItem value="drums">Drums</MenuItem>
+          <MenuItem value="other">Other</MenuItem>
+        </Select>
+      </FormControl>
       <Button type="submit" variant="contained" fullWidth>
         Sign Up
       </Button>

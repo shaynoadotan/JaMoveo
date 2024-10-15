@@ -45,7 +45,7 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 
     // Return user details including role
-     res.json({ user: { username: user.username, isAdmin: user.isAdmin, role: user.role } });
+     res.json({ user: { username: user.username, isAdmin: user.isAdmin, instrument: user.instrument } });
      return;
      // Added return statement
   } catch (error) {

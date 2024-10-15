@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import axios from 'axios';
+import { User } from '../App';
 
-const AdminSignupPage: React.FC<{ setUsername: (username: string) => void }> = ({ setUsername }) => {
+const AdminSignupPage: React.FC<{ setUser: (user: User) => void }> = ({ setUser }) => {
   const [username, setUsernameState] = useState('');
   const [password, setPassword] = useState('');
+  const [instrument, setInstrument] = useState('');
   const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -16,11 +18,15 @@ const AdminSignupPage: React.FC<{ setUsername: (username: string) => void }> = (
     }
 
     try {
-      await axios.post('http://localhost:5000/api/adminsignup', {
+      const isAdmin = true;
+      await axios.post('http://localhost:5000/api/signup', {
         username,
         password,
+        instrument,
+        isAdmin,
+        role: "player"
       });
-      setUsername(username); // Set the username on successful signup
+      setUser({username, instrument, isAdmin}); // Set the username on successful signup
       alert('Admin account created successfully');
       navigate('/admin'); // Redirect to admin page
     } catch (error) {
@@ -51,6 +57,22 @@ const AdminSignupPage: React.FC<{ setUsername: (username: string) => void }> = (
         onChange={(e) => setPassword(e.target.value)}
         required
       />
+      <FormControl fullWidth>
+        <InputLabel id="instrument-select-label">Instrument</InputLabel>
+        <Select
+          labelId="instrument-select-label"
+          id="instrument-select"
+          value={instrument}
+          label="Instrument"
+          onChange={(e) => setInstrument(e.target.value)}
+        >
+          <MenuItem value="singer">Singer</MenuItem>
+          <MenuItem value="guitar">Guitar</MenuItem>
+          <MenuItem value="bass">Bass</MenuItem>
+          <MenuItem value="drums">Drums</MenuItem>
+          <MenuItem value="other">Other</MenuItem>
+        </Select>
+      </FormControl>
       <Button type="submit" variant="contained" fullWidth>
         Sign Up
       </Button>

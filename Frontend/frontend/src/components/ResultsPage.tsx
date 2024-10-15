@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
 import { io, Socket } from 'socket.io-client';
 
@@ -15,16 +15,17 @@ interface Song {
 
 const ResultsPage: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const searchQuery = location.state?.query || ''; // Get the search query from location state
   const [socket, setSocket] = useState<Socket | null>(null);
   const [filteredSongs, setFilteredSongs] = useState<Song[]>([]); // State to hold filtered songs
 
-  useEffect(() => {
+  useEffect(() => {  
     const newSocket = io('http://localhost:5000');
     setSocket(newSocket);
 
     newSocket.on('songSelected', (song: Song) => {
-      // Handle song selection
+      navigate('/live', { state: { song } });
     });
 
     return () => {
