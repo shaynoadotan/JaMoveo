@@ -1,24 +1,28 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, Radio, RadioGroup, FormControlLabel } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Box, Button, TextField, Typography } from '@mui/material';
 import axios from 'axios';
 
-const AdminSignUpPage: React.FC = () => {
-  const [username, setUsername] = useState('');
+const AdminSignupPage: React.FC<{ setUsername: (username: string) => void }> = ({ setUsername }) => {
+  const [username, setUsernameState] = useState('');
   const [password, setPassword] = useState('');
-  const [instrument, setInstrument] = useState('');
-  const [role, setRole] = useState('singer'); // Default role
+  const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username || !password) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:5000/api/signup', {
+      await axios.post('http://localhost:5000/api/adminsignup', {
         username,
         password,
-        instrument,
-        isAdmin: true, // This is an admin signup
-        role // Add role to the signup request
       });
+      setUsername(username); // Set the username on successful signup
       alert('Admin account created successfully');
+      navigate('/admin'); // Redirect to admin page
     } catch (error) {
       console.error('Signup error:', error);
       alert('Error during signup');
@@ -34,7 +38,7 @@ const AdminSignUpPage: React.FC = () => {
         fullWidth
         margin="normal"
         value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        onChange={(e) => setUsernameState(e.target.value)}
         required
       />
       <TextField
@@ -47,21 +51,6 @@ const AdminSignUpPage: React.FC = () => {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <TextField
-        label="Instrument"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={instrument}
-        onChange={(e) => setInstrument(e.target.value)}
-        required
-      />
-
-      <RadioGroup value={role} onChange={(e) => setRole(e.target.value)}>
-        <FormControlLabel value="singer" control={<Radio />} label="Singer" />
-        <FormControlLabel value="player" control={<Radio />} label="Player" />
-      </RadioGroup>
-
       <Button type="submit" variant="contained" fullWidth>
         Sign Up
       </Button>
@@ -69,4 +58,4 @@ const AdminSignUpPage: React.FC = () => {
   );
 };
 
-export default AdminSignUpPage;
+export default AdminSignupPage;

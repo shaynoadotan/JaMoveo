@@ -1,24 +1,34 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, Radio, RadioGroup, FormControlLabel } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Box, Button, TextField, Typography } from '@mui/material';
 import axios from 'axios';
 
-const PlayerSignUpPage: React.FC = () => {
-  const [username, setUsername] = useState('');
+interface PlayerSignupPageProps {
+  setUsername: (username: string) => void;
+}
+
+const PlayerSignupPage: React.FC<PlayerSignupPageProps> = ({ setUsername }) => {
+  const [username, setUsernameState] = useState('');
   const [password, setPassword] = useState('');
   const [instrument, setInstrument] = useState('');
-  const [role, setRole] = useState('singer'); // Default role
+  const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username || !password || !instrument) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:5000/api/signup', {
+      await axios.post('http://localhost:5000/api/playersignup', {
         username,
         password,
         instrument,
-        isAdmin: false, // This is a player signup
-        role // Add role to the signup request
       });
+      setUsername(username); // Set the username on successful signup
       alert('Player account created successfully');
+      navigate('/player'); // Redirect to player page
     } catch (error) {
       console.error('Signup error:', error);
       alert('Error during signup');
@@ -34,7 +44,7 @@ const PlayerSignUpPage: React.FC = () => {
         fullWidth
         margin="normal"
         value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        onChange={(e) => setUsernameState(e.target.value)}
         required
       />
       <TextField
@@ -56,12 +66,6 @@ const PlayerSignUpPage: React.FC = () => {
         onChange={(e) => setInstrument(e.target.value)}
         required
       />
-
-      <RadioGroup value={role} onChange={(e) => setRole(e.target.value)}>
-        <FormControlLabel value="singer" control={<Radio />} label="Singer" />
-        <FormControlLabel value="player" control={<Radio />} label="Player" />
-      </RadioGroup>
-
       <Button type="submit" variant="contained" fullWidth>
         Sign Up
       </Button>
@@ -69,4 +73,4 @@ const PlayerSignUpPage: React.FC = () => {
   );
 };
 
-export default PlayerSignUpPage;
+export default PlayerSignupPage;
