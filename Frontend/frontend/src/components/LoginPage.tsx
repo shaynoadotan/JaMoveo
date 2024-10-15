@@ -5,9 +5,10 @@ import { Box, Button, TextField, Typography } from '@mui/material';
 
 interface LoginPageProps {
   setIsAdmin: (isAdmin: boolean) => void;  // Prop to set admin status in the parent
+  setRole: (role: 'singer' | 'player') => void; // Prop to set the user role
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin }) => {
+const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin, setRole }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -20,9 +21,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin }) => {
         password,
       });
 
-      // Check if the user is an admin
-      const isAdmin = response.data.user.isAdmin;
+      const { isAdmin, role } = response.data.user; // Extract role from response
       setIsAdmin(isAdmin); // Set admin status based on login response
+      setRole(role); // Set user role based on login response
 
       // Navigate to the appropriate page based on admin status
       if (isAdmin) {
@@ -30,7 +31,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin }) => {
       } else {
         navigate('/player'); // Player dashboard
       }
-
     } catch (error) {
       console.error('Login error:', error);
       alert('Error in username or password');

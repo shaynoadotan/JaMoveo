@@ -1,59 +1,57 @@
 import express, { Request, Response } from 'express';
-import bcrypt from 'bcryptjs';
-import User, { IUser } from '../models/User';  // Import IUser for typing
+import bcrypt from 'bcrypt';
+import User, { IUser } from '../models/User'; // Ensure IUser is imported for typing
 
 const router = express.Router();
 
-// Signup Route
-router.post('/signup', async (req: Request, res: Response): Promise<void> => {
-  const { username, password, instrument } = req.body;
+router.post('/signup', async (req: Request, res: Response) => {
+  const { username, password, instrument, isAdmin, role } = req.body;
 
   try {
-    // Check if user already exists
-    const existingUser: IUser | null = await User.findOne({ username });
-    if (existingUser) {
-      res.status(400).json({ message: 'User already exists' });
-      return;
-    }
-
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const user = new User({
+      username,
+      password: hashedPassword,
+      instrument,
+      isAdmin,
+      role, // Save the role
+    });
 
-    // Create a new user
-    const newUser: IUser = new User({ username, password: hashedPassword, instrument });
-    await newUser.save();
-
-    res.status(201).json({ message: 'Signup successful!' });
+    await user.save();
+     res.status(201).json({ message: 'User created successfully' });
+      // Added return statement
+      return;
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
+     res.status(500).json({ message: 'Error creating user', error }); // Added return statement
+    return;
+    }
 });
 
-// Login Route
-router.post('/login', async (req: Request, res: Response) : Promise<void> => {
+router.post('/login', async (req: Request, res: Response) => {
   const { username, password } = req.body;
 
   try {
-    // Check if user exists
-    const user = await User.findOne({ username });
+    const user: IUser | null = await User.findOne({ username });
     if (!user) {
-       res.status(400).json({ message: 'User not found' });
+       res.status(400).json({ message: 'Invalid username or password' });
        return;
     }
 
-    // Validate password
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword) {
-       res.status(400).json({ message: 'Invalid password' });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+       res.status(400).json({ message: 'Invalid username or password' });
        return;
     }
 
-    // Return user data including isAdmin
-    res.status(200).json({ message: 'Login successful!', user: { username: user.username, isAdmin: user.isAdmin } });
+    // Return user details including role
+     res.json({ user: { username: user.username, isAdmin: user.isAdmin, role: user.role } });
+     return;
+     // Added return statement
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
+     res.status(500).json({ message: 'Error logging in', error }); // Added return statement
+    return;
+    }
 });
 
-
-export default router;
+export default router; // Ensure to export the router
