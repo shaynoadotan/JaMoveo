@@ -31,22 +31,24 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  // Listen for song selection from admin
   socket.on('songSelected', (song) => {
-    console.log('Song selected by admin:', song);
-    io.emit('songSelected', song); // Emit the song to all connected clients
+    io.emit('songSelected', song);
   });
 
-  // Listen for scrolling toggle
   socket.on('toggleScrolling', (shouldScroll) => {
-    console.log('Scrolling status changed:', shouldScroll);
-    io.emit('toggleScrolling', shouldScroll); // Emit the new scrolling status to all clients
+    io.emit('toggleScrolling', shouldScroll);
+  });
+
+  // Emit quitPerformance with role
+  socket.on('quitPerformance', (role) => {
+    io.emit('quitPerformance', role); // Broadcast the quit event with role to all clients
   });
 
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
 });
+
 
 
 // Use Auth Routes
