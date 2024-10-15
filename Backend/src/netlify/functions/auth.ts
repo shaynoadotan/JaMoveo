@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import User, { IUser } from '../models/User'; // Ensure IUser is imported for typing
+import User, { IUser } from '../../models/User'; // Ensure IUser is imported for typing
 
 const router = express.Router();
 
