@@ -1,27 +1,24 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, TextField, Typography } from '@mui/material';
+import axios from 'axios';
 
-interface AdminSignUpPageProps {
-  setUsername: (username: string) => void; // Prop to set the username
-}
-
-const AdminSignUpPage: React.FC<AdminSignUpPageProps> = ({ setUsername }) => {
-  const [username, setUsernameLocal] = useState('');
+const AdminSignupPage: React.FC<{ setUsername: (username: string) => void }> = ({ setUsername }) => {
+  const [username, setUsernameState] = useState('');
   const [password, setPassword] = useState('');
-  const [instrument, setInstrument] = useState('');
   const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username || !password) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:5000/api/signup', {
+      await axios.post('http://localhost:5000/api/adminsignup', {
         username,
         password,
-        instrument,
-        isAdmin: true, // Specify that this is an admin signup
-        role: 'singer', // Set role to singer
       });
       setUsername(username); // Set the username on successful signup
       alert('Admin account created successfully');
@@ -41,7 +38,7 @@ const AdminSignUpPage: React.FC<AdminSignUpPageProps> = ({ setUsername }) => {
         fullWidth
         margin="normal"
         value={username}
-        onChange={(e) => setUsernameLocal(e.target.value)}
+        onChange={(e) => setUsernameState(e.target.value)}
         required
       />
       <TextField
@@ -54,15 +51,6 @@ const AdminSignUpPage: React.FC<AdminSignUpPageProps> = ({ setUsername }) => {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <TextField
-        label="Instrument"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={instrument}
-        onChange={(e) => setInstrument(e.target.value)}
-        required
-      />
       <Button type="submit" variant="contained" fullWidth>
         Sign Up
       </Button>
@@ -70,4 +58,4 @@ const AdminSignUpPage: React.FC<AdminSignUpPageProps> = ({ setUsername }) => {
   );
 };
 
-export default AdminSignUpPage;
+export default AdminSignupPage;

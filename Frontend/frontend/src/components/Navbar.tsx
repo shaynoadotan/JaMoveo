@@ -3,27 +3,34 @@ import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 interface NavbarProps {
-  username: string | null; // Username of the logged-in user
-  onLogout: () => void; // Function to handle logout
+  username: string | null;
+  onLogout: () => void;
+  isAdmin: boolean;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ username, onLogout }) => {
+const Navbar: React.FC<NavbarProps> = ({ username, onLogout, isAdmin }) => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    onLogout(); // Call the logout function passed as prop
-    navigate('/'); // Redirect to the sign-up page
+  const handleHomeClick = () => {
+    if (isAdmin) {
+      navigate('/admin');
+    } else if (username) {
+      navigate('/player');
+    } else {
+      navigate('/signup'); // If not logged in, go to signup
+    }
   };
 
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" style={{ flexGrow: 1 }}>
-          Hello {username ? username : 'Guest'}!
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          {username ? `Hello, ${username}` : 'Welcome'}
         </Typography>
-        <Button color="inherit" onClick={handleLogout}>
-          Logout
-        </Button>
+        <Button color="inherit" onClick={handleHomeClick}>Home</Button>
+        {username && (
+          <Button color="inherit" onClick={onLogout}>Logout</Button>
+        )}
       </Toolbar>
     </AppBar>
   );

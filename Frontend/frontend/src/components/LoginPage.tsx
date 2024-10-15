@@ -1,37 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Button, TextField, Typography, Modal } from '@mui/material';
 
 interface LoginPageProps {
-  setIsAdmin: (isAdmin: boolean) => void; // Prop to set admin status in the parent
-  setRole: (role: 'singer' | 'player') => void; // Prop to set the user role
-  setUsername: (username: string) => void; // Added prop to set the username
+  setIsAdmin: (isAdmin: boolean) => void;
+  setRole: (role: 'singer' | 'player' | null) => void;
+  setUsername: (username: string | null) => void;
+  isLoggedIn: boolean; // New prop to check if the user is logged in
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin, setRole, setUsername }) => {
-  const [username, setUsernameLocal] = useState('');
+const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin, setRole, setUsername, isLoggedIn }) => {
+  const [username, setUsernameState] = useState('');
   const [password, setPassword] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      setModalOpen(true); // Open modal if the user is already logged in
+    }
+  }, [isLoggedIn]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username || !password) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:5000/api/login', {
         username,
         password,
       });
 
-      const { isAdmin, role } = response.data.user; // Extract role from response
-      setIsAdmin(isAdmin); // Set admin status based on login response
-      setRole(role); // Set user role based on login response
+      const isAdmin = response.data.user.isAdmin;
+      const role = response.data.user.role; // Assuming the role is returned in the response
+      setIsAdmin(isAdmin);
+      setRole(role);
       setUsername(username); // Set username on login
 
-      // Navigate to the appropriate page based on admin status
       if (isAdmin) {
-        navigate('/admin');  // Admin dashboard
+        navigate('/admin');
       } else {
-        navigate('/player'); // Player dashboard
+        navigate('/player');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -48,7 +61,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin, setRole, setUsername 
         fullWidth
         margin="normal"
         value={username}
-        onChange={(e) => setUsernameLocal(e.target.value)}
+        onChange={(e) => setUsernameState(e.target.value)}
         required
       />
       <TextField
@@ -61,7 +74,27 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsAdmin, setRole, setUsername 
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      <Button type="submit" variant="contained" fullWidth>Login</Button>
+      <Button type="submit" variant="contained" fullWidth>
+        Login
+      </Button>
+
+      {/* Modal for already logged in */}
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Box sx={{ 
+          position: 'absolute', 
+          top: '50%', 
+          left: '50%', 
+          transform: 'translate(-50%, -50%)', 
+          width: 300, 
+          bgcolor: 'background.paper', 
+          boxShadow: 24, 
+          p: 4 }}>
+          <Typography variant="h6">You've already logged in</Typography>
+          <Button onClick={() => setModalOpen(false)} variant="contained" sx={{ marginTop: 2 }}>
+            Close
+          </Button>
+        </Box>
+      </Modal>
     </Box>
   );
 };

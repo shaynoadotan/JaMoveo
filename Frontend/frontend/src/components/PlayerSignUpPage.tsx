@@ -1,27 +1,30 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, TextField, Typography } from '@mui/material';
+import axios from 'axios';
 
-interface PlayerSignUpPageProps {
-  setUsername: (username: string) => void; // Prop to set the username
+interface PlayerSignupPageProps {
+  setUsername: (username: string) => void;
 }
 
-const PlayerSignUpPage: React.FC<PlayerSignUpPageProps> = ({ setUsername }) => {
-  const [username, setUsernameLocal] = useState('');
+const PlayerSignupPage: React.FC<PlayerSignupPageProps> = ({ setUsername }) => {
+  const [username, setUsernameState] = useState('');
   const [password, setPassword] = useState('');
   const [instrument, setInstrument] = useState('');
   const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!username || !password || !instrument) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
     try {
-      await axios.post('http://localhost:5000/api/signup', {
+      await axios.post('http://localhost:5000/api/playersignup', {
         username,
         password,
         instrument,
-        isAdmin: false, // Specify that this is a player signup
-        role: 'player', // Set role to player
       });
       setUsername(username); // Set the username on successful signup
       alert('Player account created successfully');
@@ -41,7 +44,7 @@ const PlayerSignUpPage: React.FC<PlayerSignUpPageProps> = ({ setUsername }) => {
         fullWidth
         margin="normal"
         value={username}
-        onChange={(e) => setUsernameLocal(e.target.value)}
+        onChange={(e) => setUsernameState(e.target.value)}
         required
       />
       <TextField
@@ -70,4 +73,4 @@ const PlayerSignUpPage: React.FC<PlayerSignUpPageProps> = ({ setUsername }) => {
   );
 };
 
-export default PlayerSignUpPage;
+export default PlayerSignupPage;
